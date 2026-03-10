@@ -4,6 +4,7 @@ import _DAM.Cine_V2.modelo.*;
 import _DAM.Cine_V2.repositorio.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,9 @@ public class DataLoader implements CommandLineRunner {
         private final SalaRepository salaRepository;
         private final FuncionRepository funcionRepository;
 
+        // Inyección del encriptador de contraseñas
+        private final PasswordEncoder passwordEncoder;
+
         @Override
         public void run(String... args) throws Exception {
                 if (rolRepository.count() > 0) {
@@ -32,21 +36,21 @@ public class DataLoader implements CommandLineRunner {
                 Rol roleAdmin = rolRepository.save(Rol.builder().nombre("ADMIN").build());
                 Rol roleUser = rolRepository.save(Rol.builder().nombre("USER").build());
 
-                // Users
+                // Users (Contraseñas encriptadas)
                 Usuario admin = Usuario.builder()
-                                .email("admin@cine.com")
-                                .password("admin") // Plain text for demo
-                                .enabled(true)
-                                .roles(Set.of(roleAdmin))
-                                .build();
+                        .email("admin@cine.com")
+                        .password(passwordEncoder.encode("admin"))
+                        .enabled(true)
+                        .roles(Set.of(roleAdmin))
+                        .build();
                 usuarioRepository.save(admin);
 
                 Usuario user = Usuario.builder()
-                                .email("user@cine.com")
-                                .password("user")
-                                .enabled(true)
-                                .roles(Set.of(roleUser))
-                                .build();
+                        .email("user@cine.com")
+                        .password(passwordEncoder.encode("user"))
+                        .enabled(true)
+                        .roles(Set.of(roleUser))
+                        .build();
                 usuarioRepository.save(user);
 
                 // Director
@@ -59,12 +63,12 @@ public class DataLoader implements CommandLineRunner {
 
                 // Pelicula
                 Pelicula inception = Pelicula.builder()
-                                .titulo("Inception")
-                                .duracion(148)
-                                .edadMinima(13)
-                                .director(nolan)
-                                .actores(Set.of(leo))
-                                .build();
+                        .titulo("Inception")
+                        .duracion(148)
+                        .edadMinima(13)
+                        .director(nolan)
+                        .actores(Set.of(leo))
+                        .build();
                 peliculaRepository.save(inception);
 
                 // Sala
@@ -73,11 +77,11 @@ public class DataLoader implements CommandLineRunner {
 
                 // Funcion
                 Funcion funcion = Funcion.builder()
-                                .pelicula(inception)
-                                .sala(sala1)
-                                .fechaHora(LocalDateTime.now().plusDays(1))
-                                .precio(10.0)
-                                .build();
+                        .pelicula(inception)
+                        .sala(sala1)
+                        .fechaHora(LocalDateTime.now().plusDays(1))
+                        .precio(10.0)
+                        .build();
                 funcionRepository.save(funcion);
 
                 System.out.println("Data loaded successfully!");
