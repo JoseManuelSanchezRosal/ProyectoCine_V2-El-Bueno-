@@ -100,7 +100,8 @@ public class UsuarioService {
         Usuario u = new Usuario();
         u.setEmail(req.email());
         u.setPassword(encoder.encode(req.password()));
-        Rol rolUser = rolRepository.findByNombre("USER")
+        //Rol rolUser = rolRepository.findByNombre("ROLE_ADMIN") Cambiamos el dataloader o aqui ADMIN
+        Rol rolUser = rolRepository.findByNombre("ADMIN") // <- SE CAMBIA PARA QUE CREE ADMIN POR DEFECTO, ANTES USER
                 .orElseThrow(( )-> new RuntimeException("Usuario no encontrado"));
         Set<Rol> roles = new HashSet<>();
         roles.add(rolUser);

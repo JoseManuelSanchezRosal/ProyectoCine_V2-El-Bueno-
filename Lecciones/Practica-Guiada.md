@@ -115,9 +115,9 @@ public record LoginResponseDTO(
 
 <div class="bg-gray-800 p-6 rounded-lg border-2 border-purple-500 relative">
   <span class="absolute -top-3 left-4 bg-purple-500 text-white px-2 text-xs rounded font-bold">Java 16+</span>
-  
-  <h3 class="text-xl font-mono text-purple-300">public record Auto(String marca) {}</h3>
-  
+
+<h3 class="text-xl font-mono text-purple-300">public record Auto(String marca) {}</h3>
+
   <ul class="mt-6 space-y-3 text-sm list-none pl-0">
     <li class="flex items-center gap-2">
       ✅ <span>Constructor Canónico</span>
@@ -862,7 +862,7 @@ Imagina que JWT es como un **DNI o Pasaporte** que te expide el servidor.
     <h3 class="font-bold text-blue-400">1. Login Exitoso</h3>
     <p class="text-sm">El servidor comprueba tu contraseña y user, y te <b>imprime</b> un carné (Token) firmado.</p>
   </div>
-  
+
   <div class="flex justify-center text-2xl opacity-50">⬇️</div>
 
   <div class="bg-gray-800 p-4 rounded border-l-4 border-green-500">
@@ -1231,13 +1231,13 @@ public LoginResponseDTO login(LoginRequestDTO req) {
 <div class="flex justify-between items-center mt-12 relative">
   <!-- Línea de progreso -->
   <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-700 -z-10"></div>
-  
+
   <!-- Fases -->
   <div class="flex flex-col items-center">
     <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center font-bold text-black border-4 border-gray-900">1</div>
     <span class="text-xs mt-2 text-green-400">Base</span>
   </div>
-  
+
   <div class="flex flex-col items-center">
     <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center font-bold text-black border-4 border-gray-900">2</div>
     <span class="text-xs mt-2 text-green-400">BCrypt</span>
@@ -1257,7 +1257,7 @@ public LoginResponseDTO login(LoginRequestDTO req) {
     <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center font-bold text-gray-400 border-4 border-gray-900">5</div>
     <span class="text-xs mt-2">Roles</span>
   </div>
-  
+
   <div class="flex flex-col items-center opacity-50">
     <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center font-bold text-gray-400 border-4 border-gray-900">6</div>
     <span class="text-xs mt-2">Final</span>
