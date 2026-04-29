@@ -33,7 +33,7 @@ public class DataLoader implements CommandLineRunner {
                 }
 
                 // Roles
-                Rol roleAdmin = rolRepository.save(Rol.builder().nombre("ADMIN").build());
+                Rol roleAdmin = rolRepository.save(Rol.builder().nombre("ROLE_ADMIN").build());
                 Rol roleUser = rolRepository.save(Rol.builder().nombre("USER").build());
 
                 // Users (Contraseñas encriptadas)

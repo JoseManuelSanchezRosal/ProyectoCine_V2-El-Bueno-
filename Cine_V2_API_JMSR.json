@@ -1,0 +1,577 @@
+{
+  "info": {
+    "_postman_id": "8df47b73-3d41-4530-9f40-8298f2990da6",
+    "name": "Cine V2 API(AminBuena)",
+    "description": "Colección de endpoints para el proyecto de Gestión de Cine V2.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50435719",
+    "_collection_link": "https://go.postman.co/collection/50435719-8df47b73-3d41-4530-9f40-8298f2990da6?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "1. Roles",
+      "item": [
+        {
+          "name": "Listar Roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/roles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "roles"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Rol (Taquillero)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombre\": \"ROLE_TAQUILLERO\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/roles",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "roles"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Usuarios",
+      "item": [
+        {
+          "name": "Listar Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Usuario (Nuevo Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"newadmin@cine.com\",\n    \"password\": \"1234\",\n    \"enabled\": true,\n    \"roles\": [\"ROLE_ADMIN\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/usuarios",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "usuarios"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"admin@cine.com\",\r\n    \"password\": \"admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"admin@cine.com\",\r\n    \"password\": \"admin\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Directores",
+      "item": [
+        {
+          "name": "Listar Directores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/directores",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "directores"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Director (Tarantino)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombre\": \"Quentin Tarantino\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/directores",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "directores"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Director (ID 1)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"id\": 1,\n    \"nombre\": \"Christopher Nolan (Updated)\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/directores/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "directores",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Actores",
+      "item": [
+        {
+          "name": "Listar Actores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/actores",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "actores"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Actor (Brad Pitt)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombre\": \"Brad Pitt\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/actores",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "actores"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Salas",
+      "item": [
+        {
+          "name": "Listar Salas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/salas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "salas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Sala (IMAX)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombre\": \"Sala IMAX\",\n    \"capacidad\": 250\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/salas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "salas"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Películas",
+      "item": [
+        {
+          "name": "Listar Películas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/peliculas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "peliculas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Película (Pulp Fiction - IDs ficticios)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"titulo\": \"Pulp Fiction\",\n    \"duracion\": 154,\n    \"edadMinima\": 18,\n    \"directorId\": 2,\n    \"actorIds\": [2]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/peliculas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "peliculas"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Funciones",
+      "item": [
+        {
+          "name": "Listar Funciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/funciones",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "funciones"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Función",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fechaHora\": \"2026-02-01T20:00:00\",\n    \"precio\": 12.50,\n    \"peliculaId\": 1,\n    \"salaId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/funciones",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "funciones"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Entradas",
+      "item": [
+        {
+          "name": "Listar Entradas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/entradas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "entradas"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "9. Ventas (Operación Compleja)",
+      "item": [
+        {
+          "name": "Listar Ventas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ventas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ventas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Venta con Entradas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fecha\": \"2026-01-24T14:00:00\",\n    \"importeTotal\": 25.00,\n    \"metodoPago\": \"TARJETA\",\n    \"estado\": \"COMPLETADA\",\n    \"usuarioId\": 2,\n    \"entradas\": [\n        {\n            \"codigo\": \"TICKET-001\",\n            \"fila\": 5,\n            \"asiento\": 10,\n            \"funcionId\": 1\n        },\n        {\n            \"codigo\": \"TICKET-002\",\n            \"fila\": 5,\n            \"asiento\": 11,\n            \"funcionId\": 1\n        }\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ventas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ventas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Intentar Comprar Asiento Ocupado (Error Testing)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"fecha\": \"2026-01-24T14:05:00\",\n    \"importeTotal\": 12.50,\n    \"metodoPago\": \"EFECTIVO\",\n    \"estado\": \"COMPLETADA\",\n    \"usuarioId\": 2,\n    \"entradas\": [\n        {\n            \"codigo\": \"TICKET-FAIL\",\n            \"fila\": 5,\n            \"asiento\": 10,\n            \"funcionId\": 1\n        }\n    ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/ventas",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ventas"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TEST",
+      "item": [
+        {
+          "name": "GetTestAdmin",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Security",
+      "item": [
+        {
+          "name": "Test Admin",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbkBjaW5lLmNvbSIsInJvbGVzIjpbIkFETUlOIl0sImlhdCI6MTc3MzA1MTk1OSwiZXhwIjoxNzczMDU1NTU5fQ.EFslgZ5Q6jyWdVFybK8lKzQWUgVkc0NJebmtoWXOpLRolaSVaFAd64AtOgQ-gUpt-0bdyZiJelq0FMH6aYVESw",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/api/v1"
+    },
+    {
+      "key": "jwt_token",
+      "value": ""
+    }
+  ]
+}
