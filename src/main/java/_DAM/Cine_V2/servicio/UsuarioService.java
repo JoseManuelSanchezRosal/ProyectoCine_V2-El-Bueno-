@@ -4,6 +4,7 @@ import _DAM.Cine_V2.config.JwtUtil;
 import _DAM.Cine_V2.dto.login.LoginRequestDTO;
 import _DAM.Cine_V2.dto.login.LoginResponseDTO;
 import _DAM.Cine_V2.dto.login.RegisterRequestDTO;
+import _DAM.Cine_V2.dto.login.RegisterResponseDTO;
 import _DAM.Cine_V2.dto.usuario.UsuarioInputDTO;
 import _DAM.Cine_V2.dto.usuario.UsuarioOutputDTO;
 import _DAM.Cine_V2.mapper.UsuarioMapper;
@@ -30,6 +31,8 @@ public class UsuarioService {
     private final UsuarioMapper usuarioMapper;
     private final PasswordEncoder encoder;
     private final JwtUtil jwtUtil;
+
+    private final RefreshTokenService refreshTokenService;
 
     public List<UsuarioOutputDTO> findAll() {
         return usuarioRepository.findAll().stream()
@@ -96,19 +99,29 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 
-    public void register(RegisterRequestDTO req) {
+    @Transactional
+    public RegisterResponseDTO register(RegisterRequestDTO req) {
+        // Validación: email único
+        if (usuarioRepository.findByEmail(req.email()).isPresent()) {
+            throw new RuntimeException("El email ya está registrado: " + req.email());
+        }
+
         Usuario u = new Usuario();
         u.setEmail(req.email());
         u.setPassword(encoder.encode(req.password()));
-        //Rol rolUser = rolRepository.findByNombre("ROLE_ADMIN") Cambiamos el dataloader o aqui ADMIN
-        Rol rolUser = rolRepository.findByNombre("ADMIN") // <- SE CAMBIA PARA QUE CREE ADMIN POR DEFECTO, ANTES USER
-                .orElseThrow(( )-> new RuntimeException("Usuario no encontrado"));
-        Set<Rol> roles = new HashSet<>();
-        roles.add(rolUser);
-        u.setRoles(roles);
+        u.setEnabled(true);
+        Rol rolUser = rolRepository.findByNombre("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Rol ROLE_USER no encontrado. ¿Ejecutaste el DataLoader?"));
+        u.setRoles(Set.of(rolUser));
         usuarioRepository.save(u);
+
+        String accessToken = jwtUtil.generateToken(u);
+        String refreshToken = refreshTokenService.createRefreshToken(u).getToken();
+
+        return new RegisterResponseDTO(u.getEmail(), "Creado", accessToken, refreshToken);
     }
 
+    @Transactional
     public LoginResponseDTO login(LoginRequestDTO req) {
         Usuario u = usuarioRepository.findByEmail(req.email())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -117,8 +130,9 @@ public class UsuarioService {
             throw new RuntimeException("Credenciales incorrectas");
         }
 
-        String token = jwtUtil.generateToken(u);
+        String accessToken = jwtUtil.generateToken(u);
+        String refreshToken = refreshTokenService.createRefreshToken(u).getToken();
 
-        return new LoginResponseDTO(u.getEmail(), "Login OK", token);
+        return new LoginResponseDTO(u.getEmail(), "Login OK", accessToken, refreshToken);
     }
 }

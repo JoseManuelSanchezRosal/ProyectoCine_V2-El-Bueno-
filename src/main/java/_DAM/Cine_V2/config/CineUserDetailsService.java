@@ -24,13 +24,7 @@ public class CineUserDetailsService implements UserDetailsService {
             .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + email));
 
         // 2. LO TRADUCIMOS al formato que Spring Security entiende
-        // User es una implementación de UserDetails que nos regala Spring
-        return User.builder()
-                .username(u.getEmail())
-                .password(u.getPassword())
-                // Stream directo en una línea:
-                // AL TENER UN ARRAY DE ROLES, TENEMOS QUE RECORRERLO PARA OBTENER EL ROL
-                .roles(u.getRoles().stream().map(Rol::getNombre).toArray(String[]::new))
-                .build();
+        // Devolvemos nuestro CineUserDetails en lugar de User
+        return new CineUserDetails(u);
     }
 }

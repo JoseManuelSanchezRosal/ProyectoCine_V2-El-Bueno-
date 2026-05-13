@@ -1,0 +1,930 @@
+﻿{
+	"info": {
+		"_postman_id": "cine-v2-matricula-honor-2024",
+		"name": "Cine V4 - Matrícula de Honor",
+		"description": "Colección completa para probar todos los endpoints del API de Cine V2. Incluye autenticación JWT automática, control de roles RBAC y auditoría JPA.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Autenticación (Pública)",
+			"item": [
+				{
+					"name": "Registrar nuevo usuario",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var json = pm.response.json();",
+									"if (json.accessToken) {",
+									"    pm.collectionVariables.set('jwt_token', json.accessToken);",
+									"    pm.collectionVariables.set('refresh_token', json.refreshToken);",
+									"    console.log('✅ Tokens guardados desde Register');",
+									"}",
+									"pm.test('Status 201 Creado', () => pm.response.to.have.status(201));",
+									"pm.test('Contiene accessToken', () => pm.expect(json.accessToken).to.not.be.undefined);"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"cliente@cine.com\",\n    \"password\": \"1234\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registra un nuevo usuario. El backend le asigna ROLE_USER automáticamente y devuelve accessToken + refreshToken. El script guarda los tokens en las variables de la colección."
+					}
+				},
+				{
+					"name": "Iniciar sesión (Login)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var json = pm.response.json();",
+									"if (json.accessToken) {",
+									"    pm.collectionVariables.set('jwt_token', json.accessToken);",
+									"    pm.collectionVariables.set('refresh_token', json.refreshToken);",
+									"    console.log('✅ Tokens guardados desde Login');",
+									"}",
+									"pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+									"pm.test('Contiene accessToken', () => pm.expect(json.accessToken).to.not.be.undefined);"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@cine.com\",\n    \"password\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login con credenciales. Cambia el body a 'user@cine.com' / 'user' para probar con un usuario normal (ROLE_USER)."
+					}
+				},
+				{
+					"name": "Renovar Token (Refresh)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var json = pm.response.json();",
+									"if (json.accessToken) {",
+									"    pm.collectionVariables.set('jwt_token', json.accessToken);",
+									"    console.log('✅ Access Token renovado');",
+									"}",
+									"pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Envía el refreshToken para obtener un nuevo accessToken sin volver a hacer login. El refreshToken dura 7 días."
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Consultas Públicas (Sin Token)",
+			"item": [
+				{
+					"name": "Listar todas las Películas",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/peliculas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"peliculas"
+							]
+						},
+						"description": "Endpoint público. Cualquier visitante puede ver la cartelera sin autenticarse. Debe devolver 200 OK."
+					}
+				},
+				{
+					"name": "Ver detalle de una Película",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/peliculas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"peliculas",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Listar todas las Funciones",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/funciones",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"funciones"
+							]
+						},
+						"description": "Endpoint público para ver horarios y sesiones disponibles."
+					}
+				},
+				{
+					"name": "Listar todas las Salas",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/salas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"salas"
+							]
+						}
+					}
+				},
+				{
+					"name": "Listar todos los Actores",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actores",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actores"
+							]
+						}
+					}
+				},
+				{
+					"name": "Listar todos los Directores",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/directores",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"directores"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Admin - Gestión de Películas (ROLE_ADMIN)",
+			"item": [
+				{
+					"name": "Crear Película",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"titulo\": \"Interstellar\",\n    \"duracion\": 169,\n    \"edadMinima\": 12,\n    \"directorId\": 1,\n    \"actorIds\": [1]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/peliculas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"peliculas"
+							]
+						},
+						"description": "Solo ROLE_ADMIN. Con ROLE_USER devuelve 403 Forbidden."
+					}
+				},
+				{
+					"name": "Actualizar Película",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"titulo\": \"Interstellar (Edición Especial)\",\n    \"duracion\": 175,\n    \"edadMinima\": 12,\n    \"directorId\": 1,\n    \"actorIds\": [1]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/peliculas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"peliculas",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Película",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/peliculas/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"peliculas",
+								"2"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Admin - Gestión de Salas (ROLE_ADMIN)",
+			"item": [
+				{
+					"name": "Crear Sala",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Sala VIP\",\n    \"capacidad\": 50\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/salas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"salas"
+							]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Sala",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Sala VIP Premium\",\n    \"capacidad\": 80\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/salas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"salas",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Sala",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/salas/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"salas",
+								"2"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Admin - Gestión de Funciones (ROLE_ADMIN)",
+			"item": [
+				{
+					"name": "Crear Función",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"peliculaId\": 1,\n    \"salaId\": 1,\n    \"fechaHora\": \"2026-06-01T20:00:00\",\n    \"precio\": 10.50\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/funciones",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"funciones"
+							]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Función",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"peliculaId\": 1,\n    \"salaId\": 1,\n    \"fechaHora\": \"2026-06-01T22:30:00\",\n    \"precio\": 12.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/funciones/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"funciones",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Función",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/funciones/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"funciones",
+								"2"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Admin - Gestión de Actores (ROLE_ADMIN)",
+			"item": [
+				{
+					"name": "Crear Actor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Scarlett Johansson\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/actores",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actores"
+							]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Actor",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Scarlett Johansson (actualizado)\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/actores/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actores",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Actor",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actores/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actores",
+								"2"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Admin - Gestión de Directores (ROLE_ADMIN)",
+			"item": [
+				{
+					"name": "Crear Director",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Steven Spielberg\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/directores",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"directores"
+							]
+						}
+					}
+				},
+				{
+					"name": "Actualizar Director",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Steven Spielberg (actualizado)\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/directores/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"directores",
+								"1"
+							]
+						}
+					}
+				},
+				{
+					"name": "Eliminar Director",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/directores/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"directores",
+								"2"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "8. Admin - Gestión de Ventas (ROLE_ADMIN)",
+			"item": [
+				{
+					"name": "Ver TODAS las Ventas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/ventas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ventas"
+							]
+						},
+						"description": "Solo ROLE_ADMIN puede ver el listado completo de todas las ventas del sistema."
+					}
+				},
+				{
+					"name": "Ver TODOS los Usuarios",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/usuarios",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuarios"
+							]
+						},
+						"description": "Solo ROLE_ADMIN puede ver el listado completo de usuarios."
+					}
+				},
+				{
+					"name": "Eliminar Usuario (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/usuarios/3",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuarios",
+								"3"
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "9. Usuario Registrado - Ventas y Perfil",
+			"item": [
+				{
+					"name": "Comprar Entradas (Crear Venta)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"metodoPago\": \"TARJETA\",\n    \"entradas\": [\n        {\n            \"fila\": 5,\n            \"asiento\": 12,\n            \"funcionId\": 1\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/ventas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ventas"
+							]
+						},
+						"description": "El backend asigna automáticamente: el usuario del JWT, la fecha actual, el estado COMPLETADO, el importeTotal sumando precios de funciones y un código único TKT-XXXXXXXX por entrada. El cliente NO debe enviar esos campos."
+					}
+				},
+				{
+					"name": "Ver Mi Venta (Soy Propietario)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/ventas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ventas",
+								"1"
+							]
+						},
+						"description": "Un usuario solo puede ver su propia venta (SpEL: @ventaService.esDelUsuario). Si intenta ver la de otro usuario, recibe 403 Forbidden."
+					}
+				},
+				{
+					"name": "Cancelar Mi Venta (Soy Propietario)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/ventas/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"ventas",
+								"1"
+							]
+						},
+						"description": "Un usuario solo puede cancelar su propia venta. El admin puede cancelar cualquiera."
+					}
+				},
+				{
+					"name": "Ver Mi Perfil",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/usuarios/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuarios",
+								"2"
+							]
+						},
+						"description": "Un usuario solo puede ver su propio perfil (#id == authentication.principal.id). Cambia el ID al tuyo. El admin puede ver cualquiera."
+					}
+				},
+				{
+					"name": "Actualizar Mi Perfil",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"mi_nuevo_email@cine.com\",\n    \"password\": \"nueva_contrasena_segura\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/usuarios/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"usuarios",
+								"2"
+							]
+						},
+						"description": "Un usuario solo puede editar su propio perfil. El admin puede editar cualquiera."
+					}
+				}
+			]
+		},
+		{
+			"name": "🔴 Pruebas de Seguridad (Deben Fallar)",
+			"item": [
+				{
+					"name": "Sin Token → Debe dar 401",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"titulo\": \"Película Pirata\",\n    \"duracion\": 90,\n    \"edadMinima\": 18,\n    \"directorId\": 1,\n    \"actorIds\": [1]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/peliculas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"peliculas"
+							]
+						},
+						"description": "Intenta crear una película SIN enviar ningún token. El CustomAuthenticationEntryPoint responde con JSON: {error: 'No autenticado', status: 401}."
+					}
+				},
+				{
+					"name": "Con Token de ROLE_USER → Debe dar 403",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"titulo\": \"Película No Autorizada\",\n    \"duracion\": 90,\n    \"edadMinima\": 18,\n    \"directorId\": 1,\n    \"actorIds\": [1]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/peliculas",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"peliculas"
+							]
+						},
+						"description": "Primero haz Login con 'user@cine.com' / 'user' para tener el token de ROLE_USER. Luego ejecuta esta petición. El CustomAccessDeniedHandler responde con JSON: {error: 'Acceso denegado', status: 403}."
+					}
+				},
+				{
+					"name": "Email Duplicado → Debe dar 500",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@cine.com\",\n    \"password\": \"cualquier_cosa\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Intenta registrar un email que ya existe en la base de datos. El UsuarioService lanza RuntimeException('El email ya está registrado')."
+					}
+				}
+			]
+		}
+	]
+}

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,16 +29,19 @@ public class ActorController {
         return ResponseEntity.ok(actorService.findById(id));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ActorOutputDTO> create(@Valid @RequestBody ActorInputDTO actorDTO) {
         return new ResponseEntity<>(actorService.save(actorDTO), HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ActorOutputDTO> update(@PathVariable Long id, @Valid @RequestBody ActorInputDTO actorDTO) {
         return ResponseEntity.ok(actorService.update(id, actorDTO));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         actorService.deleteById(id);
