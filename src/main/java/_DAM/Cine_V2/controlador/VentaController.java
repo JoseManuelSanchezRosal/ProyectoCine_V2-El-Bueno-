@@ -25,6 +25,12 @@ public class VentaController {
         return ResponseEntity.ok(ventaService.findAll());
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/mis-ventas")
+    public ResponseEntity<List<VentaOutputDTO>> findMisVentas() {
+        return ResponseEntity.ok(ventaService.findMisVentas());
+    }
+
     // ADMIN puede ver cualquier venta; el propietario solo la suya (comparando por ID numérico)
     @PreAuthorize("hasRole('ADMIN') or @ventaService.esDelUsuario(#id, authentication.principal.username)")
     @GetMapping("/{id}")

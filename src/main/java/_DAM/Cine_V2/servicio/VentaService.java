@@ -43,6 +43,15 @@ public class VentaService {
                 .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + id));
     }
 
+    public List<VentaOutputDTO> findMisVentas() {
+        String currentUserEmail = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = usuarioRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new RuntimeException("Usuario autenticado no encontrado"));
+        return ventaRepository.findByUsuarioId(usuario.getId()).stream()
+                .map(ventaMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
     public boolean esDelUsuario(Long ventaId, String email) {
         Venta venta = ventaRepository.findById(ventaId).orElse(null);
         return venta != null && venta.getUsuario() != null && venta.getUsuario().getEmail().equals(email);

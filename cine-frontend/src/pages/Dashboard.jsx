@@ -2,9 +2,13 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import api from '../services/api';
+import AdminSalesList from '../components/AdminSalesList';
+import TicketPurchaseFlow from '../components/TicketPurchaseFlow';
+import UserSalesList from '../components/UserSalesList';
 
 const Dashboard = () => {
   const [userInfo, setUserInfo] = useState(null);
+  const [activeView, setActiveView] = useState('HOME');
   const navigate = useNavigate();
 
   // Función para cargar/actualizar la info del token
@@ -18,6 +22,7 @@ const Dashboard = () => {
       const decoded = jwtDecode(token);
       const expDate = new Date(decoded.exp * 1000);
       setUserInfo({
+        id: decoded.id || decoded.usuarioId || decoded.userId || decoded.sub, // Fallback al email si no hay ID, aunque el endpoint necesita ID
         email: decoded.sub,
         roles: decoded.roles || [],
         expiration: expDate.toLocaleTimeString(),
@@ -38,22 +43,6 @@ const Dashboard = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     navigate('/');
-  };
-
-  const handleGetVentas = async () => {
-    const saleId = prompt("Introduce el ID de la venta que quieres consultar:", "1");
-    if (!saleId) return;
-
-    const token = localStorage.getItem('accessToken');
-    try {
-      // El Request Interceptor de Axios inyectará el header de Autorización automáticamente
-      const response = await api.get(`/ventas/${saleId}`);
-      console.log(`Mi Venta (ID ${saleId}):`, response.data);
-      alert(`¡Éxito! Has recuperado la venta ${saleId}. Total: ${response.data.importeTotal}€. Método: ${response.data.metodoPago}`);
-    } catch (error) {
-      console.error('Error obteniendo ventas:', error);
-      alert('Error al obtener ventas. Revisa la consola. Puede ser un 403 (No autorizado).');
-    }
   };
 
   const handleRefreshToken = async () => {
@@ -88,9 +77,9 @@ const Dashboard = () => {
   const isAdmin = userInfo.roles.includes('ROLE_ADMIN');
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4 font-sans text-white">
+    <div className="min-h-screen bg-[#0f1115] flex items-center justify-center p-4 font-sans text-white">
       {/* Tarjeta Principal */}
-      <div className="w-full max-w-2xl bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-700">
+      <div className={`w-full transition-all duration-500 ease-in-out ${activeView === 'HOME' ? 'max-w-2xl' : 'max-w-5xl'} bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700`}>
         
         {/* Encabezado */}
         <div className="bg-gray-800 px-8 py-6 border-b border-gray-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -107,39 +96,97 @@ const Dashboard = () => {
           </span>
         </div>
 
-        {/* Cuerpo (Botonera) */}
+        {/* Cuerpo */}
         <div className="p-8 space-y-4">
-          <p className="text-gray-300 mb-6">Selecciona una acción para interactuar con la API segura:</p>
+          {activeView === 'HOME' && (
+            <>
+              <p className="text-gray-300 mb-6">Selecciona una acción para interactuar con la plataforma:</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                
+                {isAdmin ? (
+                  <button 
+                    onClick={() => setActiveView('ADMIN_SALES')}
+                    className="flex flex-col items-center justify-center p-5 bg-gray-700 hover:bg-gray-600 rounded-xl transition-colors duration-200 border border-gray-600 shadow-sm"
+                  >
+                    <span className="font-bold text-white text-lg">Historial de Entradas</span>
+                    <span className="text-xs text-gray-400 mt-1">Listado global de ventas (Admin)</span>
+                  </button>
+                ) : (
+                  <>
+                    <button 
+                      onClick={() => setActiveView('TICKET_PURCHASE')}
+                      className="flex flex-col items-center justify-center p-5 bg-blue-600/20 hover:bg-blue-600/40 rounded-xl transition-colors duration-200 border border-blue-500/30 shadow-sm group"
+                    >
+                      <span className="font-bold text-blue-400 text-lg group-hover:scale-105 transition-transform">Comprar Entradas</span>
+                      <span className="text-xs text-blue-400/70 mt-1">Explora la cartelera</span>
+                    </button>
+                    <button 
+                      onClick={() => setActiveView('USER_SALES')}
+                      className="flex flex-col items-center justify-center p-5 bg-emerald-600/20 hover:bg-emerald-600/40 rounded-xl transition-colors duration-200 border border-emerald-500/30 shadow-sm group"
+                    >
+                      <span className="font-bold text-emerald-400 text-lg group-hover:scale-105 transition-transform">Mis Entradas</span>
+                      <span className="text-xs text-emerald-400/70 mt-1">Historial de compras</span>
+                    </button>
+                  </>
+                )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
-            {/* Botón Ver Ventas */}
-            <button 
-              onClick={handleGetVentas}
-              className="flex flex-col items-center justify-center p-4 bg-gray-700 hover:bg-gray-600 rounded-xl transition-colors duration-200 border border-gray-600 shadow-sm"
-            >
-              <span className="font-bold text-white">Ver Mis Entradas</span>
-              <span className="text-xs text-gray-400 mt-1">Llama a /api/v1/ventas (GET)</span>
-            </button>
+                {/* Botón Renovar Token */}
+                <button 
+                  onClick={handleRefreshToken}
+                  className="flex flex-col items-center justify-center p-5 bg-orange-600/20 hover:bg-orange-600/40 rounded-xl transition-colors duration-200 border border-orange-500/30 shadow-sm"
+                >
+                  <span className="font-bold text-orange-400">Forzar Renovación</span>
+                  <span className="text-xs text-orange-400/70 mt-1">Renovar sesión (JWT)</span>
+                </button>
 
-            {/* Botón Renovar Token */}
-            <button 
-              onClick={handleRefreshToken}
-              className="flex flex-col items-center justify-center p-4 bg-orange-600/20 hover:bg-orange-600/40 rounded-xl transition-colors duration-200 border border-orange-500/30 shadow-sm"
-            >
-              <span className="font-bold text-orange-400">Forzar Renovación</span>
-              <span className="text-xs text-orange-400/70 mt-1">Llama a /auth/refresh</span>
-            </button>
+              </div>
+            </>
+          )}
 
-            {/* Botón Admin (Condicional) */}
-            {isAdmin && (
-              <button className="sm:col-span-2 flex flex-col items-center justify-center p-4 bg-yellow-600/20 hover:bg-yellow-600/40 rounded-xl transition-colors duration-200 border border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.15)]">
-                <span className="font-bold text-yellow-500 text-lg">Panel de Administración</span>
-                <span className="text-xs text-yellow-500/70 mt-1">Visible sólo para ROLE_ADMIN</span>
+          {activeView === 'ADMIN_SALES' && isAdmin && (
+            <div className="space-y-4 animate-[fadeIn_0.5s_ease-out]">
+              <button 
+                onClick={() => setActiveView('HOME')}
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium mb-4"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Volver al Panel Principal
               </button>
-            )}
+              <AdminSalesList />
+            </div>
+          )}
 
-          </div>
+          {activeView === 'TICKET_PURCHASE' && !isAdmin && (
+            <div className="space-y-4 animate-[fadeIn_0.5s_ease-out]">
+              <button 
+                onClick={() => setActiveView('HOME')}
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium mb-4"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Volver al Panel Principal
+              </button>
+              <TicketPurchaseFlow />
+            </div>
+          )}
+
+          {activeView === 'USER_SALES' && !isAdmin && (
+            <div className="space-y-4 animate-[fadeIn_0.5s_ease-out]">
+              <button 
+                onClick={() => setActiveView('HOME')}
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium mb-4"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Volver al Panel Principal
+              </button>
+              <UserSalesList userId={userInfo.id} />
+            </div>
+          )}
         </div>
 
         {/* Footer */}
